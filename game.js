@@ -1345,7 +1345,7 @@ function handleInput() {
         } else if (GAME_MODE === 'ONLINE_HOST') {
             p1.flap();
         } else if (GAME_MODE === 'ONLINE_CLIENT') {
-            socket.emit('player_input', { r: ROOM_ID, input: 'FLAP' });
+            socket.emit('player_input', { roomId: ROOM_ID, input: 'FLAP' });
         }
     }
 }
