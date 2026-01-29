@@ -1,0 +1,264 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: #333;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #70c5ce;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.top-stats {
+    position: absolute;
+    top: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 0 #000;
+    z-index: 10;
+}
+
+.top-stats.left {
+    left: 40px;
+    color: #ff5722;
+}
+
+.top-stats.right {
+    right: 40px;
+    color: #2196f3;
+}
+
+.score {
+    position: absolute;
+    bottom: 30px;
+    /* Moved to bottom */
+    top: auto;
+    font-size: 80px;
+    font-weight: 900;
+    color: white;
+    text-shadow: 4px 4px 0 #000;
+    z-index: 10;
+}
+
+#p1-score {
+    left: 40px;
+    color: #ff5722;
+}
+
+#p2-score {
+    right: 40px;
+    color: #2196f3;
+}
+
+.effect-indicator {
+    position: absolute;
+    top: 70px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 1px 1px 0 #000;
+    text-transform: uppercase;
+}
+
+#p1-effect {
+    left: 40px;
+    text-align: left;
+}
+
+#p2-effect {
+    right: 40px;
+    text-align: right;
+}
+
+#countdown {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    pointer-events: none;
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 100;
+    pointer-events: auto;
+}
+
+.screen.active {
+    display: flex;
+}
+
+h1 {
+    font-size: 80px;
+    margin: 0 0 20px 0;
+    text-transform: uppercase;
+    color: #f1c40f;
+    text-shadow: 5px 5px 0 #d35400;
+}
+
+p {
+    font-size: 30px;
+    margin: 0;
+    animation: blink 1s infinite;
+}
+
+.controls {
+    margin-top: 50px;
+    display: flex;
+    gap: 150px;
+    font-size: 24px;
+    color: #ddd;
+    text-align: center;
+}
+
+.control-block h3 {
+    margin: 0 0 10px 0;
+    color: #fff;
+}
+
+.control-block span {
+    display: block;
+    font-size: 18px;
+    color: #aaa;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Lobby Styles */
+#lobby-screen {
+    background: url('assets/lobby_bg.png') no-repeat center center;
+    background-size: cover;
+}
+
+#lobby-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    /* Slight tint over the whole image */
+    z-index: -1;
+}
+
+.menu-box {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 350px;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 3px solid #f1c40f;
+    backdrop-filter: blur(5px);
+}
+
+button {
+    padding: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #ff5722;
+    color: white;
+    transition: transform 0.1s;
+    font-family: inherit;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+button.secondary {
+    background: #555;
+    font-size: 18px;
+}
+
+input {
+    padding: 15px;
+    font-size: 24px;
+    text-align: center;
+    border-radius: 8px;
+    border: 2px solid #fff;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-family: inherit;
+    text-transform: uppercase;
+}
+
+
+#mute-btn {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: 2px solid white;
+    font-size: 24px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 200;
+    /* Above everything */
+    padding: 0;
+    line-height: 46px;
+    /* Vertical center */
+    pointer-events: auto;
+    transition: background 0.2s;
+}
+
+#mute-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}

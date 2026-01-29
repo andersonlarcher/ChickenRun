@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chicken Race</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="ui-layer">
+            <!-- Top Stats: Obstacles + Eggs -->
+            <div id="p1-stats" class="top-stats left">🚧 0 | 🥚 0</div>
+            <div id="p2-stats" class="top-stats right">🚧 0 | 🥚 0</div>
+
+            <!-- Mute Button -->
+            <button id="mute-btn" onclick="toggleMute()">🔊</button>
+
+            <!-- Bottom Big Score (Just Obstacles Count) -->
+            <div id="p1-score" class="score">0</div>
+            <div id="p2-score" class="score">0</div>
+
+            <div id="p1-effect" class="effect-indicator"></div>
+            <div id="p2-effect" class="effect-indicator"></div>
+
+            <div id="countdown" class="active"
+                style="display:none; font-size: 150px; font-weight:bold; color: white; text-shadow: 5px 5px 0 #000;">3
+            </div>
+
+            <div id="lobby-screen" class="screen active">
+                <h1>CHICKEN RACE</h1>
+                <div class="menu-box">
+                    <button onclick="createRoom()">CREATE ROOM</button>
+                    <div class="divider">OR</div>
+                    <input type="text" id="room-code-input" placeholder="ENTER CODE" maxlength="4">
+                    <button onclick="joinRoom()">JOIN ROOM</button>
+                    <button onclick="startSinglePlayer()" class="secondary">SINGLE PLAYER</button>
+                </div>
+                <p id="lobby-status" style="margin-top:20px; font-size: 20px; color: #aaa;"></p>
+            </div>
+
+            <div id="waiting-screen" class="screen">
+                <h2>WAITING FOR OPPONENT...</h2>
+                <div id="room-code-display" style="font-size: 60px; color: #ffd700; margin: 20px;"></div>
+                <p>Share this code!</p>
+            </div>
+
+            <div id="start-screen" class="screen">
+                <h1>CHICKEN RACE</h1>
+                <p>Press SPACE to Start</p>
+                <div class="controls">
+                    <div class="control-block">
+                        <h3 style="color:#ff5722">PLAYER 1</h3>
+                        SPACE / W
+                    </div>
+                    <div class="control-block">
+                        <h3 style="color:#2196f3">PLAYER 2</h3>
+                        ENTER / UP
+                    </div>
+                </div>
+            </div>
+
+            <div id="game-over-screen" class="screen">
+                <h1 id="winner-text">GAME OVER</h1>
+                <p>Press SPACE to Restart</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game.js"></script>
+</body>
+
+</html>
