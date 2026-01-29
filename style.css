@@ -262,3 +262,77 @@ input {
 #mute-btn:hover {
     background: rgba(255, 255, 255, 0.2);
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .menu-box {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .menu-box button {
+        font-size: 18px;
+        padding: 15px;
+        margin: 10px 0;
+    }
+
+    .menu-box input {
+        font-size: 18px;
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 40px;
+        line-height: 1.2;
+    }
+
+    .top-stats {
+        font-size: 14px;
+        padding: 5px 10px;
+        top: 10px;
+    }
+
+    .top-stats.left {
+        border-radius: 0 20px 20px 0;
+        left: 0;
+    }
+
+    .top-stats.right {
+        border-radius: 20px 0 0 20px;
+        right: 0;
+    }
+
+    #mute-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        line-height: 36px;
+        top: 10px;
+    }
+
+    .score {
+        font-size: 40px;
+        bottom: 10px;
+    }
+
+    .divider {
+        margin: 10px 0;
+        font-size: 12px;
+    }
+
+    #start-screen p,
+    #game-over-screen p {
+        font-size: 20px;
+    }
+
+    #start-screen h1 {
+        font-size: 50px;
+    }
+
+    /* Bigger start button or area */
+}
+
+/* Touch Action Fix */
+canvas {
+    touch-action: none;
+}

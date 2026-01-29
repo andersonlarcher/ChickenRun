@@ -1302,52 +1302,59 @@ function loop() {
     }
 }
 
+// --- Input Handling ---
+
+function handleInput() {
+    if (gameState === 'START') {
+        startCountdown();
+    } else if (gameState === 'GAMEOVER') {
+        // Debounce restart slightly
+        if (Date.now() - (gameOverTimeout ? 0 : Date.now()) > 500) {
+            resetGame(false);
+        } else {
+            resetGame(false);
+        }
+    } else if (gameState === 'PLAYING') {
+        if (GAME_MODE === 'LOCAL') {
+            p1.flap();
+        } else if (GAME_MODE === 'SINGLE') {
+            p1.flap();
+        } else if (GAME_MODE === 'ONLINE_HOST') {
+            p1.flap();
+        } else if (GAME_MODE === 'ONLINE_CLIENT') {
+            socket.emit('player_input', { r: ROOM_ID, input: 'FLAP' });
+        }
+    }
+}
+
 // Controls
 window.addEventListener('keydown', (e) => {
-    // Only send if it matches our role
-    if (GAME_MODE === 'ONLINE_CLIENT' && PLAYER_ROLE !== 1) return; // Should not happen
-    if (GAME_MODE === 'ONLINE_HOST' && PLAYER_ROLE !== 0) return;
-
-    if (e.code === 'Space' || e.code === 'KeyW') {
-        if (GAME_MODE === 'LOCAL' || PLAYER_ROLE === 0) {
-            handleAction();
-        }
+    // Buttons to prevent default scroll
+    if (e.code === 'Space' || e.code === 'ArrowUp') {
+        // Prevent scrolling if playing
+        if (gameState === 'PLAYING' || gameState === 'START') e.preventDefault();
     }
 
-    if (e.code === 'Enter' || e.code === 'ArrowUp') {
-        if (GAME_MODE === 'LOCAL' || PLAYER_ROLE === 1) { // In Local P2 uses Enter. In Online P2 IS the client, uses Space usually?
-            // Let's standardise: In Online, ANY jump key jumps YOUR bird.
-            // But for now, stick to original keys for less confusion if testing locally.
-            if (GAME_MODE === 'LOCAL') handleActionP2();
+    if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp') {
+        // P2 Local Support
+        if (GAME_MODE === 'LOCAL' && (e.code === 'Enter' || e.code === 'ArrowUp')) {
+            if (gameState === 'PLAYING') p2.flap();
+            return;
         }
-    }
 
-    // Common input handler for Online
-    if (GAME_MODE !== 'LOCAL' && (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW')) {
-        if (PLAYER_ROLE === 1) { // Client (P2)
-            socket.emit('player_input', { roomId: ROOM_ID, input: 'FLAP' });
-            // Prediction? No, host authoritative.
-        } else {
-            // Host (P1)
-            handleAction(); // P1 Action
-        }
+        handleInput();
     }
 });
 
-function handleAction() {
-    if (gameState === 'START' || gameState === 'GAMEOVER') {
-        if (gameState === 'START') startCountdown();
-        else if (gameState === 'GAMEOVER') resetGame();
-    } else if (gameState === 'PLAYING') {
-        p1.flap();
-    }
-}
+// Touch Support
+window.addEventListener('touchstart', (e) => {
+    // Check if touching a button or input (or their children)
+    if (e.target.closest('button') || e.target.closest('input')) return;
 
-function handleActionP2() {
-    if (gameState === 'PLAYING') p2.flap();
-    else if (gameState === 'START') startCountdown();
-}
+    e.preventDefault(); // Prevent scrolling/zoom
+    handleInput();
+}, { passive: false });
 
-// Initial Init handled by Lobby now
-// But we need to init objects for valid drawing/refs
+
+// Initial Init to prevent crashes
 init();
