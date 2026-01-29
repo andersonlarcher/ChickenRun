@@ -19,6 +19,11 @@ const CONFIG = {
     ghostDuration: 600
 };
 
+// Physics / Time Step
+let lastTime = 0;
+let accumulator = 0;
+const step = 1000 / 60; // 60 FPS Target (16.66ms)
+
 const EFFECTS = { NONE: 0, SPEED_BOOST: 1, STEAL_EGGS: 2, SHOOT: 3, GHOST: 4 };
 
 // --- Asset Loading ---
@@ -1104,6 +1109,9 @@ function startCountdown(fromSync) {
             clearInterval(interval);
             ui.hideCountdown();
             gameState = 'PLAYING';
+            // Init Time Step
+            lastTime = Date.now();
+            accumulator = 0;
             loop();
         }
     }, 1000);
@@ -1296,9 +1304,23 @@ function checkGameOver() {
 
 function loop() {
     if (gameState === 'PLAYING') {
-        updateGame();
-        draw();
         requestAnimationFrame(loop);
+
+        let now = Date.now();
+        let dt = now - lastTime;
+        lastTime = now;
+
+        // Cap dt to prevent spiral of death (if game hangs per 1s, don't simulate 60 frames)
+        if (dt > 1000) dt = 1000;
+
+        accumulator += dt;
+
+        while (accumulator >= step) {
+            updateGame();
+            accumulator -= step;
+        }
+
+        draw();
     }
 }
 
