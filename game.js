@@ -8,12 +8,13 @@ let ROOM_ID = null;
 let PLAYER_ROLE = 0; // 0 = Host/P1, 1 = Client/P2
 
 // Game Config
+// Game Config
 const CONFIG = {
-    gravity: 0.07,
-    flapStrength: -3.0,
-    speed: 1.8,
-    spawnRate: 200,
-    gapSize: 270,
+    gravity: 0.25,        // Increased from 0.07 for 60FPS
+    flapStrength: -5.5,   // Increased from -3.0
+    speed: 3.5,           // Increased from 1.8
+    spawnRate: 100,       // Reduced from 200 to maintain density
+    gapSize: 220,         // Adjusted gap
     giantDuration: 450,
     invertDuration: 240,
     ghostDuration: 600
