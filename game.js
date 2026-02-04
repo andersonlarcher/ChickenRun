@@ -209,8 +209,12 @@ function stopBackgroundMusic() {
 
 
 function resize() {
+    let adH = 0;
+    const adEl = document.getElementById('ad-container');
+    if (adEl) adH = adEl.clientHeight;
+
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.height = window.innerHeight - adH;
 }
 window.addEventListener('resize', resize);
 resize();
@@ -314,6 +318,12 @@ function setupSocketListeners() {
             // Force Client Game Over
             gameState = 'GAMEOVER';
             ui.winnerText.innerText = data.msg;
+
+            // Fix: Update Stats on Client too
+            let finalScore = Math.max(score1, score2);
+            document.getElementById('end-score').innerText = finalScore;
+            document.getElementById('end-rank').innerText = getRankName(finalScore);
+
             if (gameOverTimeout) clearTimeout(gameOverTimeout);
             gameOverTimeout = setTimeout(() => {
                 ui.gameOverScreen.classList.add('active');
@@ -337,15 +347,31 @@ function checkGameOver() {
         gameState = 'GAMEOVER';
         let msg = "DRAW!";
 
+        // Fallback: Read from DOM if variables appear zero (sync issue?)
+        let s1 = score1 || parseInt(ui.p1Score.innerText) || 0;
+        let s2 = score2 || parseInt(ui.p2Score.innerText) || 0;
+
+        let finalScore = s1;
         if (GAME_MODE === 'SINGLE') {
             msg = "GAME OVER";
-            // Optional: "SCORE: " + score1
         } else {
-            if (score1 > score2) msg = "PLAYER 1 WINS!";
-            else if (score2 > score1) msg = "PLAYER 2 WINS!";
+            if (s1 > s2) {
+                msg = "PLAYER 1 WINS!";
+                finalScore = s1;
+            } else if (s2 > s1) {
+                msg = "PLAYER 2 WINS!";
+                finalScore = s2;
+            } else {
+                finalScore = Math.max(s1, s2);
+            }
         }
 
         ui.winnerText.innerText = msg;
+
+        // Update Final Stats
+        document.getElementById('end-score').innerText = finalScore;
+        document.getElementById('end-rank').innerText = getRankName(finalScore);
+
         if (gameOverTimeout) clearTimeout(gameOverTimeout);
         gameOverTimeout = setTimeout(() => {
             ui.gameOverScreen.classList.add('active');
@@ -1011,40 +1037,82 @@ let eggScore1 = 0;
 let eggScore2 = 0;
 let p1, p2;
 
+// --- Ranks ---
+const RANKS = [
+    "ROOKIE", "SURVIVOR", "SOLDIER", "MERCENARY", "VETERAN",
+    "COMMANDO", "ASSASSIN", "ELITE", "HERO", "CHAMPION",
+    "MASTER", "GRANDMASTER", "WARLORD", "TITAN", "LEGEND",
+    "MYTHIC", "GODLIKE", "IMMORTAL", "ETERNAL", "CHICKEN GOD"
+];
+
+function getRankName(score) {
+    if (score < 25) return "TRAINEE";
+    let index = Math.floor(score / 25) - 1;
+    if (index < 0) return "TRAINEE";
+    if (index >= RANKS.length) return "CHICKEN GOD+";
+    return RANKS[index];
+}
+
+function playFanfare() {
+    // fanfare: C4, E4, G4, C5!
+    let now = audioCtx.currentTime;
+    playNote(523.25, now, 0.1, 'square');
+    playNote(659.25, now + 0.1, 0.1, 'square');
+    playNote(783.99, now + 0.2, 0.1, 'square');
+    playNote(1046.50, now + 0.3, 0.4, 'square'); // High C
+}
+
 const ui = {
-    p1Score: document.getElementById('p1-score'),
-    p2Score: document.getElementById('p2-score'),
-    p1Stats: document.getElementById('p1-stats'),
-    p2Stats: document.getElementById('p2-stats'),
     startScreen: document.getElementById('start-screen'),
     gameOverScreen: document.getElementById('game-over-screen'),
     winnerText: document.getElementById('winner-text'),
-    countdownEl: document.getElementById('countdown'),
+    p1Score: document.getElementById('p1-score'), // Fixed name
+    p2Score: document.getElementById('p2-score'), // Fixed name
+    p1Stats: document.getElementById('p1-stats'),
+    p2Stats: document.getElementById('p2-stats'),
+    countdown: document.getElementById('countdown'),
+    ranking: document.getElementById('ranking-display'),
 
     updateScores: () => {
-        // Bottom Big Score
         ui.p1Score.innerText = score1;
         ui.p2Score.innerText = score2;
-
-        // Top Stats
         ui.p1Stats.innerText = `🚧 ${score1} | 🥚 ${eggScore1}`;
         ui.p2Stats.innerText = `🚧 ${score2} | 🥚 ${eggScore2}`;
     },
+
+    showRanking: (rankName) => {
+        ui.ranking.innerText = rankName + "!";
+        ui.ranking.classList.add('active');
+        playFanfare();
+
+        // Pulse effect
+        setTimeout(() => ui.ranking.style.transform = "translate(-50%, -50%) scale(1.2)", 200);
+
+        setTimeout(() => {
+            ui.ranking.classList.remove('active');
+            ui.ranking.style.transform = ""; // Reset
+        }, 2000);
+    },
+
+    showCountdown: (val) => {
+        ui.countdown.style.display = 'block';
+        ui.countdown.innerText = val;
+    },
+    hideCountdown: () => {
+        ui.countdown.style.display = 'none';
+    },
+
     showEffect: (playerIndex, text) => {
         let el = document.getElementById(playerIndex === 0 ? 'p1-effect' : 'p2-effect');
         el.innerText = text;
         el.style.opacity = 1;
+        el.style.transform = 'translate(-50%, -50%) scale(1.2)';
     },
+
     clearEffect: (playerIndex) => {
         let el = document.getElementById(playerIndex === 0 ? 'p1-effect' : 'p2-effect');
-        el.innerText = "";
-    },
-    showCountdown: (val) => {
-        ui.countdownEl.style.display = 'block';
-        ui.countdownEl.innerText = val;
-    },
-    hideCountdown: () => {
-        ui.countdownEl.style.display = 'none';
+        el.style.opacity = 0;
+        el.style.transform = 'translate(-50%, -50%) scale(1)';
     }
 };
 
@@ -1197,12 +1265,29 @@ function updateGame() {
             score1++;
             SOUNDS.score();
             ui.updateScores();
+
+            // Check Ranking
+            if (score1 > 0 && score1 % 25 === 0) {
+                let rIdx = (score1 / 25) - 1;
+                if (rIdx < RANKS.length) {
+                    let prefix = (GAME_MODE === 'SINGLE') ? "" : "P1 ";
+                    ui.showRanking(prefix + RANKS[rIdx]);
+                }
+            }
         }
         if (p.x + p.w < p2.x && !p.passedP2 && !p2.dead) {
             p.passedP2 = true;
             score2++;
             SOUNDS.score();
             ui.updateScores();
+
+            // Check Ranking
+            if (score2 > 0 && score2 % 25 === 0) {
+                let rIdx = (score2 / 25) - 1;
+                if (rIdx < RANKS.length) {
+                    ui.showRanking("P2 " + RANKS[rIdx]);
+                }
+            }
         }
         if (p.x + p.w < 0) {
             pipes.shift();

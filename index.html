@@ -60,15 +60,28 @@
                 </div>
             </div>
 
+            <!-- Arcade Ranking Display -->
+            <div id="ranking-display"></div>
+
             <div id="game-over-screen" class="screen">
                 <h1 id="winner-text">GAME OVER</h1>
+                <div class="final-stats" style="margin: 20px 0; font-size: 24px; color: white;">
+                    <p>SCORE: <span id="end-score" style="color:#2196f3; font-weight:bold;">0</span></p>
+                    <p>RANK: <span id="end-rank"
+                            style="color:#ffd700; font-weight:bold; text-shadow: 2px 2px 0 #000;">TRAINEE</span></p>
+                </div>
                 <p>Press SPACE or TAP to Restart</p>
             </div>
         </div>
-    </div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="game.js"></script>
+        <!-- Google Ad Placeholder -->
+        <div id="ad-container">
+            <!-- Replace this comment with Google Ads Script -->
+            <span style="font-size: 10px;">AD SPACE</span>
+        </div>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="game.js"></script>
 </body>
 
 </html>
