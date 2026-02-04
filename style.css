@@ -266,114 +266,70 @@ input {
 /* Mobile Responsiveness */
 @media (max-width: 600px) {
     .menu-box {
-        width: 90%;
-        padding: 20px;
-    }
-
-    .menu-box button {
-        font-size: 18px;
+        width: 85%;
         padding: 15px;
-        margin: 10px 0;
-    }
-
-    .menu-box input {
-        font-size: 18px;
-        padding: 10px;
     }
 
     h1 {
-        font-size: 40px;
-        line-height: 1.2;
+        font-size: 10vw;
+        /* Responsive font */
+        margin-bottom: 10px;
     }
 
     .top-stats {
-        font-size: 14px;
-        padding: 5px 10px;
-        top: 10px;
+        font-size: 16px;
+        padding: 4px 8px;
+        top: 5px;
+        background: rgba(0, 0, 0, 0.3);
+        /* Readability */
+        border-radius: 8px;
     }
 
     .top-stats.left {
-        border-radius: 0 20px 20px 0;
-        left: 0;
+        left: 5px;
     }
 
     .top-stats.right {
-        border-radius: 20px 0 0 20px;
-        right: 0;
+        right: 5px;
     }
 
-    #mute-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-        line-height: 36px;
-        top: 10px;
+    #p1-score {
+        left: 10px;
+    }
+
+    #p2-score {
+        right: 10px;
     }
 
     .score {
         font-size: 40px;
-        bottom: 10px;
+        bottom: 60px;
+        /* Above Ad */
     }
 
-    .divider {
-        margin: 10px 0;
-        font-size: 12px;
+    .controls {
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 20px;
     }
 
-    #start-screen p,
-    #game-over-screen p {
+    .control-block h3 {
         font-size: 20px;
     }
 
-    #start-screen h1 {
-        font-size: 50px;
+    .control-block span {
+        font-size: 14px;
     }
 
-    /* Bigger start button or area */
-}
+    #ranking-display {
+        font-size: 30px;
+        /* Smaller rank text */
+        width: 90%;
+        white-space: normal;
+        /* Allow wrap */
+    }
 
-/* Touch Action Fix */
-canvas {
-    touch-action: none;
-}
-
-#ad-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 50px;
-    /* Standard banner height */
-    background: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    border-top: 1px solid #333;
-}
-
-#ranking-display {
-    position: absolute;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    font-size: 60px;
-    font-weight: 900;
-    font-family: 'Arial Black', sans-serif;
-    color: #ffd700;
-    /* Gold */
-    -webkit-text-stroke: 2px #000;
-    text-shadow: 4px 4px 0 #b22222;
-    /* Rust/Red shadow */
-    opacity: 0;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
-    pointer-events: none;
-    z-index: 500;
-    white-space: nowrap;
-    text-align: center;
-}
-
-#ranking-display.active {
-    transform: translate(-50%, -50%) scale(1.5);
-    opacity: 1;
+    #ad-container {
+        height: 50px;
+    }
 }

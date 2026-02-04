@@ -1208,8 +1208,11 @@ function spawnPipe() {
 }
 
 function updateGame() {
-    // Only HOST or LOCAL update physics
-    if (GAME_MODE === 'ONLINE_CLIENT') return;
+    // Client Side Prediction
+    if (GAME_MODE === 'ONLINE_CLIENT') {
+        p2.update(); // Physics Loop Local
+        return;
+    }
 
     frames++;
     if (frames % CONFIG.spawnRate === 0) {
@@ -1322,12 +1325,27 @@ function broadcastState() {
 function applyState(state) {
     p1.y = state.p1.y;
     p1.dead = state.p1.dead;
-    // Apply visual effects if changed... simplification: just set flags
     p1.inverted = state.p1.inverted; p1.giant = state.p1.giant; p1.ghost = state.p1.ghost; p1.boosting = state.p1.boosting;
 
-    p2.y = state.p2.y;
-    p2.dead = state.p2.dead;
-    p2.inverted = state.p2.inverted; p2.giant = state.p2.giant; p2.ghost = state.p2.ghost; p2.boosting = state.p2.boosting;
+    // Reconciliation for P2 (Me)
+    if (GAME_MODE === 'ONLINE_CLIENT') {
+        // Only snap if huge difference (Teleport/Lag spike)
+        if (Math.abs(p2.y - state.p2.y) > 60) {
+            p2.y = state.p2.y;
+            p2.velocity = 0;
+        } else {
+            // Soft nudging towards server position (10% per frame)
+            p2.y = p2.y * 0.9 + state.p2.y * 0.1;
+        }
+        // Always trust Server death/powerups
+        p2.dead = state.p2.dead;
+        p2.inverted = state.p2.inverted; p2.giant = state.p2.giant; p2.ghost = state.p2.ghost; p2.boosting = state.p2.boosting;
+    } else {
+        // Spectator or other mode
+        p2.y = state.p2.y;
+        p2.dead = state.p2.dead;
+        p2.inverted = state.p2.inverted; p2.giant = state.p2.giant; p2.ghost = state.p2.ghost; p2.boosting = state.p2.boosting;
+    }
 
     score1 = state.score1;
     score2 = state.score2;
@@ -1434,6 +1452,8 @@ function handleInput() {
         } else if (GAME_MODE === 'ONLINE_HOST') {
             p1.flap();
         } else if (GAME_MODE === 'ONLINE_CLIENT') {
+            // Predição do Cliente: Pula instantaneamente
+            p2.flap();
             socket.emit('player_input', { roomId: ROOM_ID, input: 'FLAP' });
         }
     }
