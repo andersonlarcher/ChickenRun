@@ -872,7 +872,7 @@ class Pipe {
     }
 
     checkCollisions(bird) {
-        if (bird.dead || bird.ghost) return;
+        if (bird.dead) return;
 
         let bx = bird.x - bird.radius;
         let by = bird.y - bird.radius;
@@ -886,37 +886,39 @@ class Pipe {
             bh = bird.radius * 4;
         }
 
-        // Check collision with any segment
-        for (let seg of this.segments) {
-            if (
-                bx < this.x + this.w &&
-                bx + bw > this.x &&
-                by < seg.y + seg.h &&
-                by + bh > seg.y
-            ) {
-                // If invincible, ignore collision
-                if (bird.invincible) return;
+        // Check collision with any segment (ONLY IF NOT GHOST)
+        if (!bird.ghost) {
+            for (let seg of this.segments) {
+                if (
+                    bx < this.x + this.w &&
+                    bx + bw > this.x &&
+                    by < seg.y + seg.h &&
+                    by + bh > seg.y
+                ) {
+                    // If invincible, ignore collision
+                    if (bird.invincible) return;
 
-                // Check for Egg Shield (>= 20 eggs)
-                let currentEggs = (bird.playerIndex === 0) ? eggScore1 : eggScore2;
-                if (currentEggs >= 20) {
-                    // Survive!
-                    if (bird.playerIndex === 0) eggScore1 -= 20;
-                    else eggScore2 -= 20;
+                    // Check for Egg Shield (>= 20 eggs)
+                    let currentEggs = (bird.playerIndex === 0) ? eggScore1 : eggScore2;
+                    if (currentEggs >= 20) {
+                        // Survive!
+                        if (bird.playerIndex === 0) eggScore1 -= 20;
+                        else eggScore2 -= 20;
 
-                    ui.updateScores();
-                    SOUNDS.hit(); // Play hit sound as feedback
-                    bird.activateInvincibility(90); // 1.5 seconds invincibility
+                        ui.updateScores();
+                        SOUNDS.hit(); // Play hit sound as feedback
+                        bird.activateInvincibility(90); // 1.5 seconds invincibility
 
-                    // Show text feedback
-                    ui.showEffect(bird.playerIndex, "-20 EGGS!");
-                    setTimeout(() => ui.clearEffect(bird.playerIndex), 1000);
-                } else {
-                    // Die (Game Over)
-                    SOUNDS.death(); // Play scream
-                    bird.die();
+                        // Show text feedback
+                        ui.showEffect(bird.playerIndex, "-20 EGGS!");
+                        setTimeout(() => ui.clearEffect(bird.playerIndex), 1000);
+                    } else {
+                        // Die (Game Over)
+                        SOUNDS.death(); // Play scream
+                        bird.die();
+                    }
+                    return;
                 }
-                return;
             }
         }
 
@@ -1086,16 +1088,18 @@ function startCountdown(fromSync) {
     }
 
     gameState = 'COUNTDOWN';
-    ui.startScreen.classList.remove('active');
     ui.gameOverScreen.classList.remove('active');
 
     // Reset positions IF starting fresh
     if (fromSync || GAME_MODE !== 'ONLINE_CLIENT') init();
 
+    // Ensure start screen is hidden (in case init() showed it)
+    ui.startScreen.classList.remove('active');
+
     gameState = 'COUNTDOWN';
 
     // Start background music
-    playBackgroundMusic();
+    // playBackgroundMusic();
 
     let count = 3;
     ui.showCountdown(count);
